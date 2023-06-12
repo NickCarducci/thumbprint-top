@@ -1,8 +1,7 @@
 require("dotenv").config();
 const stripe = require("stripe")(process.env.STRIPE_SECRET); //("sk_test_4eC39HqLyjWDarjtT1zdp7dc");
 
-const OAuthClient = require("intuit-oauth"),
-  port = 8080,
+const port = 8080,
   allowedOrigins = ["https://tpt.net.co", "https://onytp.csb.app/"], //Origin: <scheme>://<hostname>:<port>
   RESSEND = (res, e) => {
     res.send(e);

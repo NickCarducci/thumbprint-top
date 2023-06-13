@@ -114,13 +114,6 @@ attach
         progress: "yet to surname factor digit counts.."
       });
 
-    if (!req.body.newAccount)
-      return RESSEND(res, {
-        statusCode,
-        statusText,
-        error: "no newAccount",
-        body: req.body
-      });
     const list = await stripe.setupIntents
       .list({
         customer: req.body.customerId

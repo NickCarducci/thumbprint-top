@@ -286,7 +286,6 @@ attach
         progress: "yet to surname factor digit counts.."
       });
 
-    var error = null;
     if (!req.body.newAccount)
       return RESSEND(res, {
         statusCode,
@@ -294,6 +293,11 @@ attach
         error: "no newAccount",
         body: req.body
       });
+    RESSEND(res, {
+      statusCode,
+      statusText,
+      newAccount: req.body.newAccount
+    });
     const acct = await stripe.accounts
       .create({
         type: req.body.type,

@@ -105,6 +105,43 @@ const nonbody = express
   .get("/", (req, res) => res.status(200).send("shove it"))
   .options("/*", preflight);
 attach
+  .post("/list", async (req, res) => {
+    var origin = refererOrigin(req, res);
+    if (!req.body || allowOriginType(origin, res))
+      return RESSEND(res, {
+        statusCode,
+        statusText,
+        progress: "yet to surname factor digit counts.."
+      });
+
+    if (!req.body.newAccount)
+      return RESSEND(res, {
+        statusCode,
+        statusText,
+        error: "no newAccount",
+        body: req.body
+      });
+    const list = await stripe.setupIntents
+      .list({
+        customer: req.body.customerId
+      })
+      .catch((e) =>
+        standardCatch(res, e, { body: req.body }, "customer (list callback)")
+      );
+
+    if (!list.data)
+      return RESSEND(res, {
+        statusCode,
+        statusText,
+        error: "no data setupIntents list",
+        list
+      });
+    RESSEND(res, {
+      statusCode,
+      statusText,
+      list: list.data
+    });
+  })
   .post("/add", async (req, res) => {
     var origin = refererOrigin(req, res),
       declarePaymentMethod = async (req, res, newStore, cb) =>

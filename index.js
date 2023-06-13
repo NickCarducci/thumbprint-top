@@ -342,6 +342,32 @@ attach
           .catch((err) => standardCatch(res, err, { email }, "createUser"));
       })
       .catch((err) => standardCatch(res, err, { auth }, "deleteUser"));
+  })
+  .post("/customer", async (req, res) => {
+    var origin = refererOrigin(req, res);
+    if (!req.body || allowOriginType(origin, res))
+      return RESSEND(res, {
+        statusCode,
+        statusText,
+        progress: "yet to surname factor digit counts.."
+      });
+
+    //RESSEND(res, { statusCode, statusText, data: "before stripe calls" });
+    const cus = await /*promiseCatcher(
+        r,
+        "customer",*/
+    stripe.customers
+      .create(req.body.customer)
+      .catch((e) => standardCatch(res, e, {}, "customer (create callback)"));
+    if (!cus.id) {
+      return RESSEND(res, {
+        statusCode,
+        statusText,
+        error: "no go customer (create)"
+      });
+    }
+
+    RESSEND(res, { statusCode, statusText, customer: cus });
   });
 //https://stackoverflow.com/questions/31928417/chaining-multiple-pieces-of-middleware-for-specific-route-in-expressjs
 app.use(nonbody, attach); //methods on express.Router() or use a scoped instance

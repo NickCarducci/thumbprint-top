@@ -1,7 +1,17 @@
 require("dotenv").config();
 const stripe = require("stripe")(process.env.STRIPE_SECRET); //("sk_test_4eC39HqLyjWDarjtT1zdp7dc");
 
-const port = 8080,
+var FIREBASEADMIN = null;
+try {
+  const finishedParsing = JSON.parse(process.env.FIREBASE_KEY),
+    { initializeApp: initApp, cert } = require("firebase-admin/app");
+  FIREBASEADMIN = initApp({
+    credential: cert(finishedParsing),
+    databaseURL: "https://vaumoney.firebaseio.com"
+  });
+} catch {}
+const { getAuth, deleteUser } = require("firebase-admin/auth"),
+  port = 8080,
   allowedOrigins = ["https://tpt.net.co", "https://onytp.csb.app/"], //Origin: <scheme>://<hostname>:<port>
   RESSEND = (res, e) => {
     res.send(e);
@@ -305,34 +315,35 @@ attach
       statusCode,
       statusText,
       account: acct
-    })
-    .post("/deleteemail", async (req, res) => {
-      if (allowOriginType(req.headers.origin, res))
-        return RESSEND(res, {
-          statusCode,
-          statusText: "not a secure origin-referer-to-host protocol"
-        });
-      var auth = req.body;
-      await deleteUser(auth)
-        .then(async () => {
-          var email = auth.email;
-          delete auth.email;
-          delete auth.emailVerified;
-          delete auth.password;
-          await getAuth(FIREBASEADMIN)
-            .createUser(auth)
-            .then((w) =>
-              RESSEND(res, {
-                statusCode,
-                statusText,
-                message: `user ${auth.uid} successfully removed ${email} from firebase and firestore`,
-                data: w // resp
-              })
-            )
-            .catch((err) => standardCatch(res, err, { email }, "createUser"));
-        })
-        .catch((err) => standardCatch(res, err, { auth }, "deleteUser"));
     });
+  })
+  .post("/deleteemail", async (req, res) => {
+    if (allowOriginType(req.headers.origin, res))
+      return RESSEND(res, {
+        statusCode,
+        statusText: "not a secure origin-referer-to-host protocol"
+      });
+    var auth = req.body;
+    await deleteUser(auth)
+      .then(async () => {
+        var email = auth.email;
+        delete auth.email;
+        delete auth.emailVerified;
+        delete auth.password;
+        await getAuth(FIREBASEADMIN)
+          .createUser(auth)
+          .then((w) =>
+            RESSEND(res, {
+              statusCode,
+              statusText,
+              message: `user ${auth.uid} successfully removed ${email} from firebase and firestore`,
+              data: w // resp
+            })
+          )
+          .catch((err) => standardCatch(res, err, { email }, "createUser"));
+      })
+      .catch((err) => standardCatch(res, err, { auth }, "deleteUser"));
+  });
 //https://stackoverflow.com/questions/31928417/chaining-multiple-pieces-of-middleware-for-specific-route-in-expressjs
 app.use(nonbody, attach); //methods on express.Router() or use a scoped instance
 app.listen(port, () => console.log(`localhost:${port}`));

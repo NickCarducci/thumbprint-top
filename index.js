@@ -198,6 +198,7 @@ attach
         (cardId) => setupIntent((req, cardId), res, "add")
       );
     var newMethod = {
+      confirm: true,
       payment_method_types: [req.body.bankcard]
     };
 

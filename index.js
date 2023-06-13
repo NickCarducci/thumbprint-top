@@ -114,7 +114,7 @@ attach
         progress: "yet to surname factor digit counts.."
       });
 
-    const list = await stripe.setupIntents
+    const list = await stripe.paymentMethods
       .list({
         customer: req.body.customerId
       })

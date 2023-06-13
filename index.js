@@ -12,7 +12,7 @@ try {
 } catch {}
 const { getAuth, deleteUser } = require("firebase-admin/auth"),
   port = 8080,
-  allowedOrigins = ["https://tpt.net.co", "https://onytp.csb.app/"], //Origin: <scheme>://<hostname>:<port>
+  allowedOrigins = ["https://tpt.net.co", "https://onytp.csb.app"], //Origin: <scheme>://<hostname>:<port>
   RESSEND = (res, e) => {
     res.send(e);
     //res.end();
@@ -293,11 +293,6 @@ attach
         error: "no newAccount",
         body: req.body
       });
-    RESSEND(res, {
-      statusCode,
-      statusText,
-      newAccount: req.body.newAccount
-    });
     const acct = await stripe.accounts
       .create({
         type: req.body.type,

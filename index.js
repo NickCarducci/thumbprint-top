@@ -12,7 +12,12 @@ try {
 } catch {}
 const { getAuth, deleteUser } = require("firebase-admin/auth"),
   port = 8080,
-  allowedOrigins = ["https://tpt.net.co", "https://onytp.csb.app"], //Origin: <scheme>://<hostname>:<port>
+  allowedOrigins = [
+    "https://tpt.net.co", 
+    "https://onytp.csb.app", 
+    "https://6sn8m3.csb.app",
+    "https://vaults.biz"
+  ], //Origin: <scheme>://<hostname>:<port>
   RESSEND = (res, e) => {
     res.send(e);
     //res.end();

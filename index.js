@@ -140,6 +140,35 @@ attach
       list: list.data
     });
   })
+  .post("/confirm", async (req, res) => {
+    //https://stripe.com/docs/api/charges/create
+    //https://stripe.com/docs/api/tokens
+    //https://stripe.com/docs/js/tokens_sources?type=paymentRequestButton
+    //https://stripe.com/docs/js/tokens_sources?type=paymentRequestButton
+    if (allowOriginType(req.headers.origin, res))
+      return RESSEND(res, {
+        statusCode,
+        statusText: "not a secure origin-referer-to-host protocol"
+      });
+    const setupIntent = await stripe.setupIntents
+      .confirm(
+        req.body.seti //'seti_1N7hpKGVa6IKUDzpbIQVdahm'
+      )
+      .catch((e) =>
+        standardCatch(res, e, {}, "setup intents (confirm callback)")
+      );
+    if (!setupIntent.id)
+      return RESSEND(res, {
+        statusCode,
+        statusText,
+        error: "no go subscription create"
+      });
+    RESSEND(res, {
+      statusCode,
+      statusText,
+      setupIntent
+    });
+  })
   .post("/add", async (req, res) => {
     var origin = refererOrigin(req, res),
       declarePaymentMethod = async (req, res, newStore, cb) =>

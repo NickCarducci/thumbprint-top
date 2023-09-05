@@ -406,6 +406,93 @@ attach
       })
       .catch((err) => standardCatch(res, err, { auth }, "deleteUser"));
   })
+  .post("/delete", async (req, res) => {
+    var origin = refererOrigin(req, res);
+    if (!req.body || allowOriginType(origin, res))
+      return RESSEND(res, {
+        statusCode,
+        statusText,
+        progress: "yet to surname factor digit counts.."
+      });
+    var deleteThese = req.body.deleteThese; 
+    const sinkThese = req.body.sinkThese; // []; //sandbox only! ("cus_")
+    if (sinkThese && sinkThese.constructor === Array) {
+      Promise.all(
+        sinkThese.map(
+          async (x) =>
+            await new Promise(
+              async (r) =>
+                await stripe.customers
+                  .del(x)
+                  .then(async () => {
+                    r("{}");
+                  })
+                  .catch((e) => {
+                    const done = JSON.stringify(e);
+                    return r(done);
+                  })
+            )
+        )
+      );
+      RESSEND(res, {
+        statusCode,
+        statusText,
+        data: "ok deleted"
+      });
+    }
+    //deleteThese = accounts.data;
+    else if (deleteThese && deleteThese.constructor === Array) {
+      Promise.all(
+        deleteThese.map(
+          async (x) =>
+            await new Promise(
+              async (r) =>
+                await stripe.accounts
+                  .del(x)
+                  .then(async () => {
+                    r("{}");
+                  })
+                  .catch((e) => {
+                    const done = JSON.stringify(e);
+                    return r(done);
+                  })
+            )
+        )
+      );
+      RESSEND(res, {
+        statusCode,
+        statusText,
+        data: "ok deleted"
+      });
+    } else
+      RESSEND(res, {
+        statusCode,
+        statusText,
+        data: "none to delete"
+      });
+  })
+  .post("/info", async (req, res) => {
+    var origin = refererOrigin(req, res);
+    if (!req.body || allowOriginType(origin, res))
+      return RESSEND(res, {
+        statusCode,
+        statusText,
+        progress: "yet to surname factor digit counts.."
+      });
+      const paymentMethod = await stripe.paymentMethods.retrieve(
+        req.body.payment_method
+      )
+      .catch((e) => standardCatch(res, e, {}, "method (retrieve callback)"));
+    if (!paymentMethod.id) {
+      return RESSEND(res, {
+        statusCode,
+        statusText,
+        error: "no go payment method (retrieve)"
+      });
+    }
+
+    RESSEND(res, { statusCode, statusText, paymentMethod });
+  })
   .post("/customer", async (req, res) => {
     var origin = refererOrigin(req, res);
     if (!req.body || allowOriginType(origin, res))

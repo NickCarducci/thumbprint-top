@@ -141,14 +141,12 @@ attach
     });
   })
   .post("/confirm", async (req, res) => {
-    //https://stripe.com/docs/api/charges/create
-    //https://stripe.com/docs/api/tokens
-    //https://stripe.com/docs/js/tokens_sources?type=paymentRequestButton
-    //https://stripe.com/docs/js/tokens_sources?type=paymentRequestButton
-    if (allowOriginType(req.headers.origin, res))
+    var origin = refererOrigin(req, res);
+    if (!req.body || allowOriginType(origin, res))
       return RESSEND(res, {
         statusCode,
-        statusText: "not a secure origin-referer-to-host protocol"
+        statusText,
+        progress: "yet to confirm payment intent"
       });
     const setupIntent = await stripe.setupIntents
       .confirm(
@@ -161,7 +159,7 @@ attach
       return RESSEND(res, {
         statusCode,
         statusText,
-        error: "no go subscription create"
+        error: "no go intent create"
       });
     RESSEND(res, {
       statusCode,

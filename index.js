@@ -140,7 +140,7 @@ attach
       list: list.data
     });
   })
-  .post("/pay", async (req, res) => {
+  .post("/transfer", async (req, res) => {
     var origin = refererOrigin(req, res);
     if (!req.body || allowOriginType(origin, res))
       return RESSEND(res, {
@@ -152,7 +152,8 @@ attach
         amount: req.body.total,
         currency: 'usd',
         //automatic_payment_methods: {enabled: true},
-        payment_method: req.body.payment_method
+        payment_method: req.body.payment_method,
+        transfer_data: {destination:req.body.stripeId}
       });
     if (!paymentIntent.id)
       return RESSEND(res, {

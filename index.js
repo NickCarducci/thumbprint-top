@@ -9,12 +9,12 @@ try {
     credential: cert(finishedParsing),
     databaseURL: "https://vaumoney.firebaseio.com"
   });
-} catch {}
+} catch { }
 const { getAuth, deleteUser } = require("firebase-admin/auth"),
   port = 8080,
   allowedOrigins = [
-    "https://tpt.net.co", 
-    "https://onytp.csb.app", 
+    "https://tpt.net.co",
+    "https://onytp.csb.app",
     "https://6sn8m3.csb.app",
     "https://vaults.biz"
   ], //Origin: <scheme>://<hostname>:<port>
@@ -140,6 +140,56 @@ attach
       list: list.data
     });
   })
+  .post("/pay", async (req, res) => {
+    var origin = refererOrigin(req, res);
+    if (!req.body || allowOriginType(origin, res))
+      return RESSEND(res, {
+        statusCode,
+        statusText,
+        progress: "yet to attach payment method"
+      });
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: req.body.total,
+        currency: 'usd',
+        //automatic_payment_methods: {enabled: true},
+        payment_method: req.body.payment_method
+      });
+    if (!paymentIntent.id)
+      return RESSEND(res, {
+        statusCode,
+        statusText,
+        error: "no go intent create"
+      });
+    RESSEND(res, {
+      statusCode,
+      statusText,
+      paymentIntent
+    });
+  })
+  .post("/attach", async (req, res) => {
+    var origin = refererOrigin(req, res);
+    if (!req.body || allowOriginType(origin, res))
+      return RESSEND(res, {
+        statusCode,
+        statusText,
+        progress: "yet to attach payment method"
+      });
+      const paymentMethod = await stripe.paymentMethods.attach(
+        req.body.payment_method,
+        {customer: req.body.customerId}
+      );
+    if (!paymentMethod.id)
+      return RESSEND(res, {
+        statusCode,
+        statusText,
+        error: "no go intent create"
+      });
+    RESSEND(res, {
+      statusCode,
+      statusText,
+      paymentMethod
+    });
+  })
   .post("/confirm", async (req, res) => {
     var origin = refererOrigin(req, res);
     if (!req.body || allowOriginType(origin, res))
@@ -193,21 +243,21 @@ attach
           type: req.body.type, //"customer_balance"//"us_bank_account" "card"
           ...(req.body.type === "card"
             ? {
-                card: {
-                  number: req.body.primary, //16-digit primary,
-                  exp_month: req.body.exp_month, //no zero-digit padding
-                  exp_year: req.body.exp_year,
-                  cvc: req.body.security
-                }
-              } //newCard
+              card: {
+                number: req.body.primary, //16-digit primary,
+                exp_month: req.body.exp_month, //no zero-digit padding
+                exp_year: req.body.exp_year,
+                cvc: req.body.security
+              }
+            } //newCard
             : {
-                us_bank_account: {
-                  account_holder_type: req.body.company, //"individual"
-                  account_number: req.body.account,
-                  account_type: req.body.savings, //"savings"
-                  routing_number: req.body.routing
-                }
-              }), //newBank
+              us_bank_account: {
+                account_holder_type: req.body.company, //"individual"
+                account_number: req.body.account,
+                account_type: req.body.savings, //"savings"
+                routing_number: req.body.routing
+              }
+            }), //newBank
           billing_details: {
             address: req.body.address,
             email: req.body.email,
@@ -294,9 +344,9 @@ attach
       return RESSEND(res, { statusCode, statusText, error });
     }
     const obj = {
-        [req.body.type === "custom" ? "stripecustom" : "stripe"]: acct_.id,
-        mcc: req.body.mcc
-      },
+      [req.body.type === "custom" ? "stripecustom" : "stripe"]: acct_.id,
+      mcc: req.body.mcc
+    },
       obj1 = { ...obj, redo: "true" };
     const accLink = await stripe.accountLinks
       .create({
@@ -414,7 +464,7 @@ attach
         statusText,
         progress: "yet to surname factor digit counts.."
       });
-    var deleteThese = req.body.deleteThese; 
+    var deleteThese = req.body.deleteThese;
     const sinkThese = req.body.sinkThese; // []; //sandbox only! ("cus_")
     if (sinkThese && sinkThese.constructor === Array) {
       Promise.all(
@@ -479,9 +529,9 @@ attach
         statusText,
         progress: "yet to surname factor digit counts.."
       });
-      const paymentMethod = await stripe.paymentMethods.retrieve(
-        req.body.payment_method
-      )
+    const paymentMethod = await stripe.paymentMethods.retrieve(
+      req.body.payment_method
+    )
       .catch((e) => standardCatch(res, e, {}, "method (retrieve callback)"));
     if (!paymentMethod.id) {
       return RESSEND(res, {
@@ -506,9 +556,9 @@ attach
     const cus = await /*promiseCatcher(
         r,
         "customer",*/
-    stripe.customers
-      .create(req.body.customer)
-      .catch((e) => standardCatch(res, e, {}, "customer (create callback)"));
+      stripe.customers
+        .create(req.body.customer)
+        .catch((e) => standardCatch(res, e, {}, "customer (create callback)"));
     if (!cus.id) {
       return RESSEND(res, {
         statusCode,

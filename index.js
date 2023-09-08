@@ -183,7 +183,7 @@ attach
       return RESSEND(res, {
         statusCode,
         statusText,
-        error: "no go intent create"
+        error: "no go paymentMethod attach"
       });
     RESSEND(res, {
       statusCode,

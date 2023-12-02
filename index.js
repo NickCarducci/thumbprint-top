@@ -624,7 +624,7 @@ attach
         statusText: "not a secure origin-referer-to-host protocol"
       });
 
-    const intent = await stripe.paymentIntents
+    const paymentIntent = await stripe.paymentIntents
       .create({
         amount: Number(req.body.total),
         currency: "usd",
@@ -644,6 +644,16 @@ attach
       })
       .catch((e) => standardCatch(res, e, {}, "intent (create callback)"));
 
+    if (!paymentIntent.client_secret)
+      return RESSEND(res, {
+        statusCode,
+        statusText,
+        error: "no go setupIntent create"
+      });
+    const intent = await stripe.paymentIntents.confirm(
+      paymentIntent.client_secret //"pi_1Gt0RG2eZvKYlo2CtxkQK2rm",
+      // { payment_method: "pm_card_visa" }
+    );
     if (!intent.client_secret)
       return RESSEND(res, {
         statusCode,

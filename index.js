@@ -13,6 +13,7 @@ try {
 const { getAuth, deleteUser } = require("firebase-admin/auth"),
   port = 8080,
   allowedOrigins = [
+    "https://yktgvd.csb.app",
     "https://tpt.net.co",
     "https://onytp.csb.app",
     "https://6sn8m3.csb.app",

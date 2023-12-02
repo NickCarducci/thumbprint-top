@@ -148,13 +148,13 @@ attach
         statusText,
         progress: "yet to attach payment method"
       });
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount: req.body.total,
-        currency: 'usd',
-        //automatic_payment_methods: {enabled: true},
-        payment_method: req.body.payment_method,
-        transfer_data: {destination:req.body.stripeId}
-      });
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: req.body.total,
+      currency: 'usd',
+      //automatic_payment_methods: {enabled: true},
+      payment_method: req.body.payment_method,
+      transfer_data: { destination: req.body.stripeId }
+    });
     if (!paymentIntent.id)
       return RESSEND(res, {
         statusCode,
@@ -175,10 +175,10 @@ attach
         statusText,
         progress: "yet to attach payment method"
       });
-      const paymentMethod = await stripe.paymentMethods.attach(
-        req.body.payment_method,
-        {customer: req.body.customerId}
-      );
+    const paymentMethod = await stripe.paymentMethods.attach(
+      req.body.payment_method,
+      { customer: req.body.customerId }
+    );
     if (!paymentMethod.id)
       return RESSEND(res, {
         statusCode,
@@ -569,6 +569,52 @@ attach
     }
 
     RESSEND(res, { statusCode, statusText, customer: cus });
+  })
+  .post("/paynow", async (req, res) => {
+    //https://stripe.com/docs/api/charges/create
+    //https://stripe.com/docs/api/tokens
+    //https://stripe.com/docs/js/tokens_sources?type=paymentRequestButton
+    //https://stripe.com/docs/js/tokens_sources?type=paymentRequestButton
+    if (allowOriginType(req.headers.origin, res))
+      return RESSEND(res, {
+        statusCode,
+        statusText: "not a secure origin-referer-to-host protocol"
+      });
+
+    /*RESSEND(res, {
+      statusCode,
+      statusText,
+      total: req.body.total
+    });*/
+    const charge = await stripe.charges
+      .create({
+        amount: Number(req.body.total),
+        currency: "usd",
+        source: req.body.card.payment_token,
+        description: "Card payment",
+        shipping: {
+          address: req.body.address,
+          name: req.body.name,
+          phone: req.body.phone
+        },
+        receipt_email: req.body.email,
+        transfer_data: {
+          destination: req.body.storeId //method.id //"{{CONNECTED_STRIPE_ACCOUNT_ID}}"
+        }
+      })
+      .catch((e) => standardCatch(res, e, {}, "charge (create callback)"));
+
+    if (!charge.id)
+      return RESSEND(res, {
+        statusCode,
+        statusText,
+        error: "no go setupIntent create"
+      });
+    RESSEND(res, {
+      statusCode,
+      statusText,
+      charge
+    });
   });
 //https://stackoverflow.com/questions/31928417/chaining-multiple-pieces-of-middleware-for-specific-route-in-expressjs
 app.use(nonbody, attach); //methods on express.Router() or use a scoped instance

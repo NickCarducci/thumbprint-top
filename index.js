@@ -644,7 +644,7 @@ attach
       })
       .catch((e) => standardCatch(res, e, {}, "intent (create callback)"));
 
-    if (!charge.id)
+    if (!intent.client_secret)
       return RESSEND(res, {
         statusCode,
         statusText,

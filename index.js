@@ -616,7 +616,8 @@ attach
       statusText,
       charge
     });
-  }) .post("/payintent", async (req, res) => {
+  })
+  .post("/payintent", async (req, res) => {
     if (allowOriginType(req.headers.origin, res))
       return RESSEND(res, {
         statusCode,
@@ -629,6 +630,7 @@ attach
         currency: "usd",
         automatic_payment_methods: {
           enabled: true
+          //allow_redirects: "never"
         },
         description: "Card payment",
         shipping: {
@@ -650,8 +652,9 @@ attach
         error: "no go setupIntent create"
       });
     const intent = await stripe.paymentIntents.confirm(
-      paymentIntent.id //"pi_1Gt0RG2eZvKYlo2CtxkQK2rm",
+      paymentIntent.id, //"pi_1Gt0RG2eZvKYlo2CtxkQK2rm",
       // { payment_method: "pm_card_visa" }
+      { return_url: req.body.return_url }
     );
     if (!intent.client_secret)
       return RESSEND(res, {

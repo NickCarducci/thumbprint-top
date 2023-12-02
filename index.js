@@ -609,12 +609,51 @@ attach
       return RESSEND(res, {
         statusCode,
         statusText,
-        error: "no go setupIntent create"
+        error: "no go charges create"
       });
     RESSEND(res, {
       statusCode,
       statusText,
       charge
+    });
+  })
+  .post("/payintent", async (req, res) => {
+    if (allowOriginType(req.headers.origin, res))
+      return RESSEND(res, {
+        statusCode,
+        statusText: "not a secure origin-referer-to-host protocol"
+      });
+
+    const intent = await stripe.paymentIntents
+      .create({
+        amount: Number(req.body.total),
+        currency: "usd",
+        automatic_payment_methods: {
+          enabled: true
+        },
+        description: "Card payment",
+        shipping: {
+          address: req.body.address,
+          name: req.body.name,
+          phone: req.body.phone
+        },
+        receipt_email: req.body.email,
+        transfer_data: {
+          destination: req.body.storeId //method.id //"{{CONNECTED_STRIPE_ACCOUNT_ID}}"
+        }
+      })
+      .catch((e) => standardCatch(res, e, {}, "intent (create callback)"));
+
+    if (!charge.id)
+      return RESSEND(res, {
+        statusCode,
+        statusText,
+        error: "no go setupIntent create"
+      });
+    RESSEND(res, {
+      statusCode,
+      statusText,
+      intent
     });
   });
 //https://stackoverflow.com/questions/31928417/chaining-multiple-pieces-of-middleware-for-specific-route-in-expressjs

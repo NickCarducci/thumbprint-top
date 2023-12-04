@@ -690,6 +690,36 @@ attach
       statusText,
       intent: paymentIntent
     });
+  })
+  .post("/balance", async (req, res) => {
+    var origin = refererOrigin(req, res);
+    if (!req.body || allowOriginType(origin, res))
+      return RESSEND(res, {
+        statusCode,
+        statusText,
+        progress: "yet to surname factor digit counts.."
+      });
+
+    const balance = await stripe.balance.retrieve({
+      stripeAccount: req.body.storeId
+    });
+    /*const cashBalance = await stripe.customers
+      .retrieveCashBalance(req.body.customerId)
+      .catch((e) =>
+        standardCatch(res, e, {}, "cash balance (retrieve callback)")
+      );*/
+
+    if (!balance.available)
+      return RESSEND(res, {
+        statusCode,
+        statusText,
+        error: "no go balance retrieve"
+      });
+    RESSEND(res, {
+      statusCode,
+      statusText,
+      balance
+    });
   });
 //https://stackoverflow.com/questions/31928417/chaining-multiple-pieces-of-middleware-for-specific-route-in-expressjs
 app.use(nonbody, attach); //methods on express.Router() or use a scoped instance

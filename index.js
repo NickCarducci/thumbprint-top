@@ -623,27 +623,49 @@ attach
         statusCode,
         statusText: "not a secure origin-referer-to-host protocol"
       });
-
+    const customer = await stripe.customers.create({
+      description: "",
+      address: req.body.address,
+      name: req.body.name,
+      phone: req.body.phone,
+      shipping: {
+        address: req.body.address,
+        name: req.body.name,
+        phone: req.body.phone
+      }
+    });
+    if (!customer.id)
+      return RESSEND(res, {
+        statusCode,
+        statusText,
+        error: "no go customer create"
+      });
     const paymentIntent = await stripe.paymentIntents
-      .create({
-        payment_method: req.body.payment_method,
-        amount: Number(req.body.total),
-        currency: "usd",
-        automatic_payment_methods: {
-          enabled: true
-          //allow_redirects: "never"
-        },
-        description: "Card payment",
-        shipping: {
-          address: req.body.address,
-          name: req.body.name,
-          phone: req.body.phone
-        },
-        //receipt_email: req.body.email,
-        transfer_data: {
-          destination: req.body.storeId //method.id //"{{CONNECTED_STRIPE_ACCOUNT_ID}}"
+      .create(
+        {
+          customer: customer.id,
+          payment_method: req.body.payment_method,
+          amount: Number(req.body.total),
+          currency: "usd",
+          automatic_payment_methods: {
+            enabled: true
+            //allow_redirects: "never"
+          },
+          description: "Card payment",
+          shipping: {
+            address: req.body.address,
+            name: req.body.name,
+            phone: req.body.phone
+          },
+          //receipt_email: req.body.email,
+          transfer_data: {
+            destination: req.body.storeId //method.id //"{{CONNECTED_STRIPE_ACCOUNT_ID}}"
+          }
         }
-      })
+        /*{
+          stripeAccount: customer.id //'{{CONNECTED_ACCOUNT_ID}}',
+        }*/
+      )
       .catch((e) => standardCatch(res, e, {}, "intent (create callback)"));
 
     if (!paymentIntent.client_secret)

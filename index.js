@@ -720,6 +720,38 @@ attach
       statusText,
       balance
     });
+  })
+  .post("/payout", async (req, res) => {
+    //https://stripe.com/docs/api/charges/create
+    //https://stripe.com/docs/api/tokens
+    //https://stripe.com/docs/js/tokens_sources?type=paymentRequestButton
+    //https://stripe.com/docs/js/tokens_sources?type=paymentRequestButton
+    if (allowOriginType(req.headers.origin, res))
+      return RESSEND(res, {
+        statusCode,
+        statusText: "not a secure origin-referer-to-host protocol"
+      });
+
+    const payout = await stripe.payouts.create(
+      {
+        amount: req.body.total,
+        currency: "usd"
+      },
+      {
+        stripeAccount: req.body.storeId
+      }
+    );
+    if (!payout.id)
+      return RESSEND(res, {
+        statusCode,
+        statusText,
+        error: "no go setupIntent create"
+      });
+    RESSEND(res, {
+      statusCode,
+      statusText,
+      payout
+    });
   });
 //https://stackoverflow.com/questions/31928417/chaining-multiple-pieces-of-middleware-for-specific-route-in-expressjs
 app.use(nonbody, attach); //methods on express.Router() or use a scoped instance

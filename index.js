@@ -626,6 +626,7 @@ attach
 
     const paymentIntent = await stripe.paymentIntents
       .create({
+        payment_method: req.body.payment_method,
         amount: Number(req.body.total),
         currency: "usd",
         automatic_payment_methods: {
@@ -651,7 +652,7 @@ attach
         statusText,
         error: "no go setupIntent create"
       });
-    const intent = await stripe.paymentIntents.confirm(
+    /*const intent = await stripe.paymentIntents.confirm(
       paymentIntent.id, //"pi_1Gt0RG2eZvKYlo2CtxkQK2rm",
       // { payment_method: "pm_card_visa" }
       { return_url: req.body.return_url }
@@ -661,11 +662,11 @@ attach
         statusCode,
         statusText,
         error: "no go setupIntent create"
-      });
+      });*/
     RESSEND(res, {
       statusCode,
       statusText,
-      intent
+      intent: paymentIntent
     });
   });
 //https://stackoverflow.com/questions/31928417/chaining-multiple-pieces-of-middleware-for-specific-route-in-expressjs

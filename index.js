@@ -623,7 +623,7 @@ attach
         statusCode,
         statusText: "not a secure origin-referer-to-host protocol"
       });
-    const customer = await stripe.customers.create({
+    /*const customer = await stripe.customers.create({
       description: "",
       address: req.body.address,
       name: req.body.name,
@@ -639,11 +639,11 @@ attach
         statusCode,
         statusText,
         error: "no go customer create"
-      });
+      });*/
     const paymentIntent = await stripe.paymentIntents
       .create(
         {
-          customer: customer.id,
+          //customer: customer.id,
           payment_method: req.body.payment_method,
           amount: Number(req.body.total),
           currency: "usd",

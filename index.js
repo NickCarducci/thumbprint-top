@@ -657,6 +657,7 @@ attach
             name: req.body.name,
             phone: req.body.phone
           },
+          application_fee_amount: req.body.fee,
           //receipt_email: req.body.email,
           transfer_data: {
             destination: req.body.storeId //method.id //"{{CONNECTED_STRIPE_ACCOUNT_ID}}"

@@ -312,6 +312,65 @@ attach
       setupIntent
     });
   })
+  .post("/reapply", async (req, res) => {
+    var origin = refererOrigin(req, res);
+    //RESSEND(res, { statusCode, statusText, data: "ok without headers" });
+    if (!req.body || allowOriginType(origin, res))
+      return RESSEND(res, {
+        statusCode,
+        statusText,
+        progress: "yet to surname factor digit counts.."
+      });
+    const obj = {
+        [req.body.type === "custom" ? "stripecustom" : "stripe"]: acct_.id,
+        mcc: req.body.mcc
+      },
+      obj1 = { ...obj, redo: "true" };
+    const accLink =
+      /*promiseCatcher( r,
+                          "accountLink",*/
+      await stripe.accountLinks
+        .create({
+          account: req.body.stripeId, //: 'acct_1032D82eZvKYlo2C',
+          return_url:
+            origin +
+            "?" +
+            String(
+              Object.keys(obj).map(
+                (key, i) =>
+                  key +
+                  "=" +
+                  obj[key] +
+                  (i !== Object.keys(obj).length - 1 ? "&" : "")
+              )
+            ).replaceAll(",", ""),
+          refresh_url:
+            origin +
+            "?" +
+            String(
+              Object.keys(obj1).map(
+                (key, i) =>
+                  key +
+                  "=" +
+                  obj1[key] +
+                  (i !== Object.keys(obj1).length - 1 ? "&" : "")
+              )
+            ).replaceAll(",", ""),
+          type: "account_onboarding"
+        })
+        .catch((e) =>
+          standardCatch(res, e, { acct_ }, "accountLink (create callback)")
+        );
+    if (!accLink.url) {
+      const error = "accountLink";
+      return RESSEND(res, { statusCode, statusText, error });
+    }
+    RESSEND(res, {
+      statusCode,
+      statusText: "successful accountLink",
+      account: { id: acct_.id, accountLink: accLink, person: person_ }
+    });
+  })
   .post("/beneficiary", async (req, res) => {
     var origin = refererOrigin(req, res);
     //RESSEND(res, { statusCode, statusText, data: "ok without headers" });

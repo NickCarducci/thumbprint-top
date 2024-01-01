@@ -373,7 +373,7 @@ attach
               (key, i) =>
                 key +
                 "=" +
-                obj[key] +
+                obj1[key] +
                 (i !== Object.keys(obj1).length - 1 ? "&" : "")
             )
           ).replaceAll(",", ""),

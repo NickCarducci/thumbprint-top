@@ -368,7 +368,7 @@ attach
     RESSEND(res, {
       statusCode,
       statusText: "successful accountLink",
-      account: { id: acct_.id, accountLink: accLink, person: person_ }
+      account: { id: req.body.stripeId, accountLink: accLink }
     });
   })
   .post("/beneficiary", async (req, res) => {

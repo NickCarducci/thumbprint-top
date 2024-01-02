@@ -153,6 +153,7 @@ attach
       amount: req.body.total,
       currency: 'usd',
       customer: req.body.customerId,
+      confirm: true,
       //automatic_payment_methods: {enabled: true},
       payment_method: req.body.payment_method,
       transfer_data: { destination: req.body.stripeId }

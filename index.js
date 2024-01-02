@@ -154,6 +154,7 @@ attach
       currency: 'usd',
       customer: req.body.customerId,
       confirm: true,
+      payment_method_types: ['card','us_bank_account'],
       //automatic_payment_methods: {enabled: true},
       payment_method: req.body.payment_method,
       transfer_data: { destination: req.body.stripeId }

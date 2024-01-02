@@ -157,6 +157,7 @@ attach
       payment_method_types: ['card','us_bank_account'],
       //automatic_payment_methods: {enabled: true},
       payment_method: req.body.payment_method,
+      application_fee_amount: req.body.fee,
       transfer_data: { destination: req.body.stripeId }
     });
     if (!paymentIntent.id)
